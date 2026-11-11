@@ -10,22 +10,22 @@
 
 | 工作 | 引擎 | 可配置吗 |
 | :-- | :-- | :-- |
-| 搜公开网页 | `firecrawl`、`keenable`、`youcom`、`antigravity-cli`、`tavily`、`exa` | 首选引擎加每引擎参与开关 |
+| 搜公开网页 | `keenable`、`firecrawl`、`youcom`、`antigravity-cli`、`tavily`、`exa` | 首选引擎加每引擎参与开关 |
 | 读一个 URL | 首选引擎（若它能抓取），然后是 `firecrawl`、`antigravity-cli`、`local` | 每引擎参与开关 |
 | 搜 X（推特） | `grok-cli` | 每引擎参与开关 |
 
-搜索顺序固定为 `firecrawl`、`keenable`、`youcom`、`antigravity-cli`、`tavily`、`exa`。抓取顺序是 `firecrawl`、`antigravity-cli`、`local`。每个引擎默认都参与。`engines.<name>.enabled: false` 会先排除一个引擎，可用性再过滤剩余名单，额度冷却最后重排就绪链（见下文）。Firecrawl 领跑两条链，因为它的免注册通道在裸机上就能用，不要账号不要 key。Keenable 排搜索第二也是同样的理由：Firecrawl 额度用完时，裸机上还有一个免注册的后备。You.com 排第三：额度更小的免注册通道（每个 IP 每天 100 次），给前两个都用完的繁忙 IP 兜底。
+搜索顺序固定为 `keenable`、`firecrawl`、`youcom`、`antigravity-cli`、`tavily`、`exa`。抓取顺序是 `firecrawl`、`antigravity-cli`、`local`。每个引擎默认都参与。`engines.<name>.enabled: false` 会先排除一个引擎，可用性再过滤剩余名单，额度冷却最后重排就绪链（见下文）。Keenable 领跑搜索链，因为它的免注册通道在裸机上就能用，不要账号不要 key，每小时额度也宽裕（每个 IP 每小时 1,000 次）。Firecrawl 排搜索第二也是同样的理由：Keenable 的每小时额度用完时，裸机上还有一个免注册的后备。Firecrawl 同时领跑抓取链，因为它同样免注册，而 Keenable 不能抓取。You.com 排第三：额度更小的免注册通道（每个 IP 每天 100 次），给前两个都用完的繁忙 IP 兜底。
 
 从这张表能推出两个事实，它们回答大多数问题：
 
 - **单页抓取零配置可用。** `local` 引擎零安装，默认是抓取的最后兜底。只有用户明确禁用它时才会离开自动链。
-- **网页搜索可在 Firecrawl 免注册免费额度上运行**（每月 1,000 credits，无需注册），后面还有 Keenable 的免注册额度（每个 IP 每小时 1,000 次）和 You.com 的免注册搜索（每个 IP 每天 100 次）。配置了 `engine` 时以配置为准。搜索链不含 `local`，因为 `local` 不能搜索。三个免注册引擎都被限流时，搜索至少还需要一个带 key 的引擎或 `agy` 作为后备。抓取仍有 `local` 兜底。
+- **网页搜索可在 Keenable 免注册免费额度上运行**（每个 IP 每小时 1,000 次，无需注册），后面还有 Firecrawl 的免注册额度（每月 1,000 credits）和 You.com 的免注册搜索（每个 IP 每天 100 次）。配置了 `engine` 时以配置为准。搜索链不含 `local`，因为 `local` 不能搜索。三个免注册引擎都被限流时，搜索至少还需要一个带 key 的引擎或 `agy` 作为后备。抓取仍有 `local` 兜底。
 
 X 是独立语料，不是竞争的搜索引擎，所以它永远不会顶替网页搜索。`--source` 选语料，`--engine` 选工具。
 
 ## 零配置
 
-modsearch 没有配置文件也能跑：抓取有 `local` 兜底，搜索先走 Firecrawl 的免注册免费额度，再走 Keenable 的，再走 You.com 的。搜索没有 local 后备（`local` 不能搜索），所以三个免注册引擎都被限流时需要一个带 key 的引擎或 `agy`。它看这台机器上有什么，用最好的那个。只有用户想改变这一点时才需要建配置。
+modsearch 没有配置文件也能跑：抓取有 `local` 兜底，搜索先走 Keenable 的免注册免费额度，再走 Firecrawl 的，再走 You.com 的。搜索没有 local 后备（`local` 不能搜索），所以三个免注册引擎都被限流时需要一个带 key 的引擎或 `agy`。它看这台机器上有什么，用最好的那个。只有用户想改变这一点时才需要建配置。
 
 首选的免费升级是 Antigravity CLI，它写带引用的综述，一个工具同时覆盖搜索和抓取，还不要 key：
 
@@ -138,7 +138,7 @@ Exa 返回排好序的链接和高亮片段，但不写综述，所以它的 sum
 
 ### firecrawl（搜索 + 抓取，默认免注册）
 
-默认引擎，也是裸安装能直接干活的原因：Firecrawl 的免注册通道[每月送 1,000 免费 credits，无需注册](https://www.firecrawl.dev/blog/firecrawl-keyless-launch)。免注册请求不发送 Authorization header，按 IP 计量，受每日请求数和 credits 两项上限约束（[限流文档](https://docs.firecrawl.dev/rate-limits#keyless-no-api-key)没有公开每日上限的具体数字）。在 https://firecrawl.dev 领一个免费 key，可以再得独享的每月 1,000 credits 和更高限额：
+默认抓取引擎，在搜索顺序里排第二，也是裸安装能直接干活的原因之一：Firecrawl 的免注册通道[每月送 1,000 免费 credits，无需注册](https://www.firecrawl.dev/blog/firecrawl-keyless-launch)。免注册请求不发送 Authorization header，按 IP 计量，受每日请求数和 credits 两项上限约束（[限流文档](https://docs.firecrawl.dev/rate-limits#keyless-no-api-key)没有公开每日上限的具体数字）。在 https://firecrawl.dev 领一个免费 key，可以再得独享的每月 1,000 credits 和更高限额：
 
 ```bash
 modsearch config set firecrawl.apiKey <key>
@@ -152,7 +152,7 @@ modsearch config set firecrawl.keylessFetch false   # 让自动抓取不走云�
 
 ### keenable（搜索，默认免注册）
 
-不要 key 也不用注册，在搜索顺序里排第二，紧跟 Firecrawl。免注册请求走 Keenable 的公共端点，每个 IP 每小时 1,000 次（同一 IP 上所有人共用），每秒最多 10 次。在 https://app.keenable.ai 领一个免费 key，请求就改走带 key 的端点：没有每小时上限，每个组织每月 100,000 次。
+不要 key 也不用注册，在搜索顺序里排第一，是默认搜索引擎。免注册请求走 Keenable 的公共端点，每个 IP 每小时 1,000 次（同一 IP 上所有人共用），每秒最多 10 次。在 https://app.keenable.ai 领一个免费 key，请求就改走带 key 的端点：没有每小时上限，每个组织每月 100,000 次。
 
 ```bash
 modsearch config set keenable.apiKey <key>
@@ -163,7 +163,7 @@ Keenable 只搜索，所以 `-u` 配 `-e keenable` 会报错。它和 Exa 一样
 
 ### youcom（搜索，只有免注册）
 
-不要 key 也不用注册，在搜索顺序里排第三，在 Firecrawl 和 Keenable 之后。请求走 `https://api.you.com/v1/agents/search`，每个 IP 每天 100 次（同一 IP 上所有人共用）。它没有 `apiKey`、`baseURL` 或模型设置，也没有带 key 的升级方式。`--max-results` 最多 50。想让自动路由跳过它，设 `engines.youcom.enabled: false`，`-e youcom` 仍可单次强制使用。
+不要 key 也不用注册，在搜索顺序里排第三，在 Keenable 和 Firecrawl 之后。请求走 `https://api.you.com/v1/agents/search`，每个 IP 每天 100 次（同一 IP 上所有人共用）。它没有 `apiKey`、`baseURL` 或模型设置，也没有带 key 的升级方式。`--max-results` 最多 50。想让自动路由跳过它，设 `engines.youcom.enabled: false`，`-e youcom` 仍可单次强制使用。
 
 You.com 只搜索，所以 `-u` 配 `-e youcom` 会报错。它和 Keenable 一样返回排好序的链接和片段（You.com 有 `page_age` 时作为发布日期带上），但不写综述，所以 summary 是机械拼的，会有一条 warning 说明这一点，证据在 `items` 里。
 

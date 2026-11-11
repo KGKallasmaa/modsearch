@@ -10,22 +10,22 @@ Three jobs, called roles. Each role has engines that can do it:
 
 | Job | Engines | Configurable? |
 | :-- | :-- | :-- |
-| search the public web | `firecrawl`, `keenable`, `youcom`, `antigravity-cli`, `tavily`, `exa` | preferred engine plus per-engine participation |
+| search the public web | `keenable`, `firecrawl`, `youcom`, `antigravity-cli`, `tavily`, `exa` | preferred engine plus per-engine participation |
 | read one URL | the preferred engine if it can fetch, then `firecrawl`, `antigravity-cli`, `local` | per-engine participation |
 | search X (Twitter) | `grok-cli` | per-engine participation |
 
-The search order is fixed at `firecrawl` then `keenable` then `youcom` then `antigravity-cli` then `tavily` then `exa`, and fetch is `firecrawl` then `antigravity-cli` then `local`. Every engine participates by default. `engines.<name>.enabled: false` filters one out, availability filters what remains, and quota cooldown reorders the ready chain (see below). Firecrawl leads both chains because its keyless tier works on a bare machine, no signup, no key. Keenable comes second in search for the same reason, so a bare machine still has a keyless fallback when Firecrawl's allowance runs out. You.com comes third: a smaller keyless pool (100 searches a day per IP) for when both run dry on a busy IP.
+The search order is fixed at `keenable` then `firecrawl` then `youcom` then `antigravity-cli` then `tavily` then `exa`, and fetch is `firecrawl` then `antigravity-cli` then `local`. Every engine participates by default. `engines.<name>.enabled: false` filters one out, availability filters what remains, and quota cooldown reorders the ready chain (see below). Keenable leads search because its keyless tier works on a bare machine, no signup, no key, with a generous hourly pool (1,000 requests an hour per IP). Firecrawl comes second in search for the same reason, so a bare machine still has a keyless fallback when Keenable's hourly pool runs out, and it leads fetch because it is keyless too and Keenable cannot fetch. You.com comes third: a smaller keyless pool (100 searches a day per IP) for when both run dry on a busy IP.
 
 Two facts follow from this table, and they answer most questions:
 
 - **Page fetch works with no setup.** The `local` engine needs nothing installed and is the default last resort. It only leaves the automatic chain when the user explicitly disables it.
-- **Web search works keyless on Firecrawl's free quota** (1,000 credits/month, no signup), with Keenable's keyless pool (1,000 requests/hour per IP) and You.com's keyless search (100 searches/day per IP) behind it. A configured `engine` choice takes precedence when set. The search chain does not include `local`, because `local` cannot search. If all three keyless engines are rate-limited, search needs at least one keyed engine or `agy` as a fallback. Fetch still has `local` as a floor.
+- **Web search works keyless on Keenable's free pool** (1,000 requests/hour per IP, no signup), with Firecrawl's keyless quota (1,000 credits/month) and You.com's keyless search (100 searches/day per IP) behind it. A configured `engine` choice takes precedence when set. The search chain does not include `local`, because `local` cannot search. If all three keyless engines are rate-limited, search needs at least one keyed engine or `agy` as a fallback. Fetch still has `local` as a floor.
 
 X is a separate corpus, not a competing search engine, so it never replaces web search. `--source` chooses corpora, `--engine` chooses the tool.
 
 ## Zero setup
 
-modsearch runs with no config file at all: fetch has `local` as a floor, and search runs on Firecrawl's keyless free quota, then Keenable's, then You.com's. Search has no `local` fallback (`local` cannot search), so when all three keyless engines are rate-limited it needs a keyed engine or `agy`. It looks at what is on the machine and uses the best thing available. Only create a config when the user wants to change that.
+modsearch runs with no config file at all: fetch has `local` as a floor, and search runs on Keenable's keyless free pool, then Firecrawl's, then You.com's. Search has no `local` fallback (`local` cannot search), so when all three keyless engines are rate-limited it needs a keyed engine or `agy`. It looks at what is on the machine and uses the best thing available. Only create a config when the user wants to change that.
 
 Antigravity CLI is the best free upgrade, because it synthesizes cited answers and covers both search and fetch with no key:
 
@@ -139,7 +139,7 @@ Exa ranks and links with highlight snippets but writes no synthesis, so its summ
 
 ### firecrawl (search + fetch, keyless by default)
 
-The default engine, and the reason a bare install works: Firecrawl's keyless tier grants [1,000 free credits a month with no signup](https://www.firecrawl.dev/blog/firecrawl-keyless-launch). Keyless requests omit the Authorization header and are metered per IP with daily request and credit caps (Firecrawl does not publish the daily numbers in its [rate-limit documentation](https://docs.firecrawl.dev/rate-limits#keyless-no-api-key)). A free key from https://firecrawl.dev adds a personal 1,000 credits/month and higher limits:
+The default fetch engine and second in the search order, and a reason a bare install works: Firecrawl's keyless tier grants [1,000 free credits a month with no signup](https://www.firecrawl.dev/blog/firecrawl-keyless-launch). Keyless requests omit the Authorization header and are metered per IP with daily request and credit caps (Firecrawl does not publish the daily numbers in its [rate-limit documentation](https://docs.firecrawl.dev/rate-limits#keyless-no-api-key)). A free key from https://firecrawl.dev adds a personal 1,000 credits/month and higher limits:
 
 ```bash
 modsearch config set firecrawl.apiKey <key>
@@ -153,7 +153,7 @@ Every Firecrawl fetch spends a credit and forces a fresh crawl. modsearch sends 
 
 ### keenable (search, keyless by default)
 
-Works with no key and no signup, and sits second in the search order, right after Firecrawl. Keyless requests go to Keenable's public endpoint, which allows 1,000 requests an hour per IP (shared by everyone on that IP) and at most 10 a second. A free key from https://app.keenable.ai moves the calls to the keyed endpoint: no hourly cap, 100,000 requests a month per organization.
+Works with no key and no signup, and sits first in the search order: the default search engine. Keyless requests go to Keenable's public endpoint, which allows 1,000 requests an hour per IP (shared by everyone on that IP) and at most 10 a second. A free key from https://app.keenable.ai moves the calls to the keyed endpoint: no hourly cap, 100,000 requests a month per organization.
 
 ```bash
 modsearch config set keenable.apiKey <key>
@@ -164,7 +164,7 @@ Keenable searches only, so `-u` with `-e keenable` is an error. Like Exa, it ret
 
 ### youcom (search, keyless only)
 
-Works with no key and no signup, and sits third in the search order, after Firecrawl and Keenable. Requests go to `https://api.you.com/v1/agents/search`, which allows 100 searches a day per IP (shared by everyone on that IP). There is no `apiKey`, `baseURL`, or model setting, and no keyed upgrade. `--max-results` is capped at 50. Turn it off for automatic routing with `engines.youcom.enabled: false`, and `-e youcom` still forces it for one run.
+Works with no key and no signup, and sits third in the search order, after Keenable and Firecrawl. Requests go to `https://api.you.com/v1/agents/search`, which allows 100 searches a day per IP (shared by everyone on that IP). There is no `apiKey`, `baseURL`, or model setting, and no keyed upgrade. `--max-results` is capped at 50. Turn it off for automatic routing with `engines.youcom.enabled: false`, and `-e youcom` still forces it for one run.
 
 You.com searches only, so `-u` with `-e youcom` is an error. Like Keenable, it returns ranked links with snippets (and a publish date from You.com's `page_age` when it has one) but writes no synthesis, so its summary is mechanical, a warning says so, and the evidence is in `items`.
 

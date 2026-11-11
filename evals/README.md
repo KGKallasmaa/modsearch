@@ -48,7 +48,7 @@ Each file in `cases/` default-exports one object:
   built-in local engine as the floor), so it always runs, but it needs network.
   A network failure is recorded as a fail with the error.
 - `search` — runs when doctor resolves the search role. A normal installation
-  resolves at least Firecrawl's keyless endpoint.
+  resolves at least Keenable's keyless endpoint.
 - `search-no-social` — runs only when search is set up **and** Grok is not, since
   the point is to observe the degrade. Skipped where Grok is signed in.
 

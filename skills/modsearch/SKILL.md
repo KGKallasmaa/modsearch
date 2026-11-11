@@ -35,7 +35,7 @@ powershell -ExecutionPolicy Bypass -File <skill-dir>\scripts\run.ps1 -q "test"  
 
 The launcher finds a working way to run modsearch and forwards your arguments to it unchanged. It tries, in order: a compatible `modsearch` already on `PATH`, then `npx`, then `bunx`. If none of those exists it prints a JSON diagnosis to stderr and exits 78, with a `nextSteps` list for the user. Relay those steps instead of retrying. To see the full diagnosis, run `bash <skill-dir>/scripts/run.sh doctor --json` (on a machine that can launch the CLI it also chains modsearch's own engine/config `doctor`).
 
-Nothing else needs setting up first: modsearch works with no config file. Web search and page fetch run out of the box on Firecrawl's keyless free quota (no signup, no key), and a configured engine or API key takes precedence when present.
+Nothing else needs setting up first: modsearch works with no config file. Web search runs out of the box on Keenable's keyless free quota and page fetch on Firecrawl's (no signup, no key), and a configured engine or API key takes precedence when present.
 
 ### If you cannot run the launcher script
 
@@ -72,7 +72,7 @@ Three jobs, each with its own engines:
 
 | Role | Engines (best first) | Notes |
 | :-- | :-- | :-- |
-| search the web | `firecrawl`, `keenable`, `youcom`, `antigravity-cli`, `tavily`, `exa` | Firecrawl works keyless with no signup (1,000 free credits/month), and so do Keenable (1,000 requests/hour, shared per IP) and You.com (100 searches/day, shared per IP). agy is free with a browser sign-in. Tavily, Exa, and a free Firecrawl or Keenable key add personal quotas. |
+| search the web | `keenable`, `firecrawl`, `youcom`, `antigravity-cli`, `tavily`, `exa` | Keenable works keyless with no signup (1,000 requests/hour, shared per IP), and so do Firecrawl (1,000 free credits/month) and You.com (100 searches/day, shared per IP). agy is free with a browser sign-in. Tavily, Exa, and a free Firecrawl or Keenable key add personal quotas. |
 | fetch a page | `firecrawl`, `antigravity-cli`, `local` | Firecrawl runs a cloud browser, keyless by default (`firecrawl.keylessFetch false` opts out). `local` needs nothing and is the default floor. |
 | search X | `grok-cli` | Needs Grok Build with SuperGrok or X Premium. |
 
@@ -124,7 +124,7 @@ Fetch mode replaces `items` with `content` (the page as text or markdown) and `l
 
 Every error this CLI prints names its cause, and most already name the fix, so read the message first. When setup is the suspect, run `modsearch doctor` (spends no quota): it reports each engine's readiness per role and the config in effect, with a fix command for anything missing. `--json` gives a machine-readable report.
 
-- `Every engine for the web source failed`: read the attempt list. A bare install includes keyless Firecrawl, Keenable, and You.com, so this means runtime failures such as no network, timeout, or exhausted limits rather than missing setup.
+- `Every engine for the web source failed`: read the attempt list. A bare install includes keyless Keenable, Firecrawl, and You.com, so this means runtime failures such as no network, timeout, or exhausted limits rather than missing setup.
 - `Every engine for the <source> source failed`: each engine's failure is listed, and `attempts` in a returned entry carries the same per-engine errors. Act on the first fixable one.
 - Quota exhausted (agy weekly quota, or `exa`/`firecrawl`/`keenable` out of credits, or Keenable's hourly or You.com's daily keyless allowance used up): not fatal when another search engine is set up, since search falls through on its own and cooldown moves the spent engine to the back. Otherwise relay the reset time from the message.
 - Timeouts: retry once with `--timeout 300000`. If it still fails, report the exact error instead of answering from stale memory.

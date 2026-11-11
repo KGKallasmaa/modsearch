@@ -20,10 +20,10 @@ Before decoding a message, run `modsearch doctor`. It reports your Node version,
 
 ```
 Every engine for the web source failed.
-  - firecrawl: ...
+  - keenable: ...
 ```
 
-Firecrawl, Keenable, and You.com all search through keyless endpoints, so a bare installation has an engine. This message now means every candidate failed at runtime. Read the attempt lines for the actual causes, commonly no network, a timeout, exhausted anonymous daily limits, Keenable's hourly keyless pool running out, You.com's daily keyless allowance running out, or a configured engine's quota.
+Keenable, Firecrawl, and You.com all search through keyless endpoints, so a bare installation has an engine. This message now means every candidate failed at runtime. Read the attempt lines for the actual causes, commonly no network, a timeout, exhausted anonymous daily limits, Keenable's hourly keyless pool running out, You.com's daily keyless allowance running out, or a configured engine's quota.
 
 ```bash
 curl -fsSL https://antigravity.google/cli/install.sh | bash && agy   # then sign in
@@ -45,7 +45,7 @@ firecrawl does not allow keyless use from a proxy or VPN exit IP. Set a free key
 
 modsearch reads `http_proxy` / `https_proxy` / `no_proxy` (either case) for every engine API call and for page fetch, with no extra Node flag. The proxy has to be in the environment of the process that starts modsearch. A harness launched by a service manager, not a login shell, often lacks it, and then the attempt lines show a DNS or connection cause such as `EAI_AGAIN`, `ENOTFOUND`, or `ECONNREFUSED`. Export the variables where the harness starts, or in its service unit. Versions before 5.10.12 honored the proxy only for page fetch, so search failed on every engine with a bare `fetch failed`.
 
-Firecrawl refuses keyless calls from IPs it reads as a VPN or a proxy. Waiting does not help: configure a free Firecrawl key, or let Keenable and You.com answer (they come next in the chain without any change).
+Firecrawl refuses keyless calls from IPs it reads as a VPN or a proxy. Waiting does not help: configure a free Firecrawl key, or let Keenable and You.com answer (Keenable already leads the search chain and You.com follows, with no change needed).
 
 ## Quota exhausted
 
