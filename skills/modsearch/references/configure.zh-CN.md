@@ -14,7 +14,7 @@
 | 读一个 URL | 首选引擎（若它能抓取），然后是 `firecrawl`、`antigravity-cli`、`local` | 每引擎参与开关 |
 | 搜 X（推特） | `grok-cli` | 每引擎参与开关 |
 
-搜索顺序固定为 `keenable`、`firecrawl`、`youcom`、`antigravity-cli`、`tavily`、`exa`。抓取顺序是 `firecrawl`、`antigravity-cli`、`local`。每个引擎默认都参与。`engines.<name>.enabled: false` 会先排除一个引擎，可用性再过滤剩余名单，额度冷却最后重排就绪链（见下文）。Keenable 领跑搜索链，因为它的免注册通道在裸机上就能用，不要账号不要 key，每小时额度也宽裕（每个 IP 每小时 1,000 次）。Firecrawl 排搜索第二也是同样的理由：Keenable 的每小时额度用完时，裸机上还有一个免注册的后备。Firecrawl 同时领跑抓取链，因为它同样免注册，而 Keenable 不能抓取。You.com 排第三：额度更小的免注册通道（每个 IP 每天 100 次），给前两个都用完的繁忙 IP 兜底。
+搜索顺序固定为 `keenable`、`firecrawl`、`youcom`、`antigravity-cli`、`tavily`、`exa`。抓取顺序是 `firecrawl`、`antigravity-cli`、`local`。每个引擎默认都参与。`engines.<name>.enabled: false` 会先排除一个引擎，可用性再过滤剩余名单，额度冷却最后重排就绪链（见下文）。Keenable 领跑搜索链，因为它的免注册通道在裸机上就能用，不要账号不要 key，每小时额度也宽裕（每个 IP 每小时 1,000 次），而且在 [NEEDLE](https://keenableai.github.io/needle/) 上它是本链引擎里排名最好的。NEEDLE 是 Keenable 开源的实时网页搜索 API 基准测试，每小时或每天用同一批新查询测所有引擎，代码和原始结果都公开。截至 2026 年 11 月 10 日，Keenable 得分为上限的 75%，中位延迟 152 ms；Exa 71%，You.com 61%，Firecrawl 49%，Tavily 43%。这个基准由 Keenable 自己运营，请以[实时结果](https://keenableai.github.io/needle/results)为准，不要只看这份快照。Firecrawl 排搜索第二也是同样的理由：Keenable 的每小时额度用完时，裸机上还有一个免注册的后备。Firecrawl 同时领跑抓取链，因为它同样免注册，而 Keenable 不能抓取。You.com 排第三：额度更小的免注册通道（每个 IP 每天 100 次），给前两个都用完的繁忙 IP 兜底。
 
 从这张表能推出两个事实，它们回答大多数问题：
 
@@ -152,7 +152,7 @@ modsearch config set firecrawl.keylessFetch false   # 让自动抓取不走云�
 
 ### keenable（搜索，默认免注册）
 
-不要 key 也不用注册，在搜索顺序里排第一，是默认搜索引擎。免注册请求走 Keenable 的公共端点，每个 IP 每小时 1,000 次（同一 IP 上所有人共用），每秒最多 10 次。在 https://app.keenable.ai 领一个免费 key，请求就改走带 key 的端点：没有每小时上限，每个组织每月 100,000 次。
+不要 key 也不用注册，在搜索顺序里排第一，是默认搜索引擎。免注册请求走 Keenable 的公共端点，每个 IP 每小时 1,000 次（同一 IP 上所有人共用），每秒最多 10 次。在 https://app.keenable.ai 领一个免费 key，请求就改走带 key 的端点：没有每小时上限，每个组织每月 100,000 次。它和其他引擎在相关性与延迟上的对比，可在 [NEEDLE](https://keenableai.github.io/needle/results) 上实时查看。
 
 ```bash
 modsearch config set keenable.apiKey <key>

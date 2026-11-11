@@ -105,7 +105,10 @@ const ENGINES: Record<string, SearchEngine> = {
 export const ROLE_PREFERENCE: Record<Role, string[]> = {
   // Keenable leads: it is keyless with a generous hourly pool (1,000 requests
   // an hour per IP) and returns ranked results fast, so a bare machine with no
-  // signup searches out of the box. Firecrawl is the second keyless engine,
+  // signup searches out of the box. It also ranks at or near the top of NEEDLE
+  // (https://keenableai.github.io/needle/), Keenable's open, live benchmark of
+  // search APIs for agents, which scores every engine in this chain on the
+  // same fresh queries, with the lowest median latency. Firecrawl is the second keyless engine,
   // a fallback when Keenable's hourly pool runs out. You.com is the third,
   // smallest keyless pool (100 a day per IP), there for when both run dry on a
   // busy IP. agy synthesizes and cites but its weekly quota is small, so it
