@@ -40,12 +40,12 @@ describe('doctor: Node version', () => {
 describe('doctor: search engines', () => {
   afterEach(() => cleanupTempDirs());
 
-  it('reports agy ready when its binary is on PATH, behind keyless firecrawl', () => {
+  it('reports agy ready when its binary is on PATH, behind keyless keenable', () => {
     const report = runDoctor({ config: {}, env: envWithBinaries('agy') });
     const agy = engine(report, 'search', 'antigravity-cli');
     expect(agy?.ready).toBe(true);
-    // Keyless firecrawl leads the default chain, so it resolves first.
-    expect(role(report, 'search')?.resolved).toBe('firecrawl');
+    // Keyless keenable leads the default chain, so it resolves first.
+    expect(role(report, 'search')?.resolved).toBe('keenable');
   });
 
   it('reports tavily ready from an env key and tags the source', () => {
@@ -90,8 +90,8 @@ describe('doctor: search engines', () => {
 
   it('gives a copyable fix for a missing key and missing agy', () => {
     const report = runDoctor({ config: {}, env: BARE_ENV });
-    // Keyless firecrawl means search always resolves, even on a bare machine.
-    expect(role(report, 'search')?.resolved).toBe('firecrawl');
+    // Keyless keenable means search always resolves, even on a bare machine.
+    expect(role(report, 'search')?.resolved).toBe('keenable');
     const fc = engine(report, 'search', 'firecrawl');
     expect(fc?.ready).toBe(true);
     expect(fc?.reason).toMatch(/keyless/i);

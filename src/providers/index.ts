@@ -103,15 +103,15 @@ const ENGINES: Record<string, SearchEngine> = {
  * machine with nothing installed still lands on something that works.
  */
 export const ROLE_PREFERENCE: Record<Role, string[]> = {
-  // Firecrawl leads: its keyless allowance works on a bare machine with no
-  // signup, which is the product's zero-setup promise. Keenable is the second
-  // keyless engine, so a bare machine still has a fallback when Firecrawl's
-  // daily allowance runs out. You.com is the third, smallest keyless pool
-  // (100 a day per IP), there for when both run dry on a busy IP. agy
-  // synthesizes and cites but its weekly quota is small, so it backs the
-  // keyless engines up rather than fronting the chain. Tavily and Exa are
-  // keyed backups.
-  search: ['firecrawl', 'keenable', 'youcom', 'antigravity-cli', 'tavily', 'exa'],
+  // Keenable leads: it is keyless with a generous hourly pool (1,000 requests
+  // an hour per IP) and returns ranked results fast, so a bare machine with no
+  // signup searches out of the box. Firecrawl is the second keyless engine,
+  // a fallback when Keenable's hourly pool runs out. You.com is the third,
+  // smallest keyless pool (100 a day per IP), there for when both run dry on a
+  // busy IP. agy synthesizes and cites but its weekly quota is small, so it
+  // backs the keyless engines up rather than fronting the chain. Tavily and
+  // Exa are keyed backups.
+  search: ['keenable', 'firecrawl', 'youcom', 'antigravity-cli', 'tavily', 'exa'],
   // Firecrawl runs a cloud browser for JS-heavy pages, keyless by default
   // (opt out with firecrawl.keylessFetch false). agy extracts to a focus. The
   // local needs no setup and returns the page as served, so it stays the

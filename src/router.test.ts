@@ -63,11 +63,11 @@ describe('source selection', () => {
 });
 
 describe('engine chains per role', () => {
-  it('leads search with keyless firecrawl, then agy, then tavily when keyed', () => {
+  it('leads search with keyless keenable, then firecrawl, agy, and tavily when keyed', () => {
     const withKey = config({ engines: { tavily: { apiKey: 'k' } } });
     expect(names(planRole('search', withKey, undefined, WITH_AGY).chain)).toEqual([
-      'firecrawl',
       'keenable',
+      'firecrawl',
       'youcom',
       'antigravity-cli',
       'tavily',
@@ -77,8 +77,8 @@ describe('engine chains per role', () => {
   it('adds exa to the search chain after tavily when an exa key exists', () => {
     const withKeys = config({ engines: { tavily: { apiKey: 't' }, exa: { apiKey: 'e' } } });
     expect(names(planRole('search', withKeys, undefined, WITH_AGY).chain)).toEqual([
-      'firecrawl',
       'keenable',
+      'firecrawl',
       'youcom',
       'antigravity-cli',
       'tavily',
@@ -86,13 +86,13 @@ describe('engine chains per role', () => {
     ]);
   });
 
-  it('keeps firecrawl at the front of the search chain when keyed', () => {
+  it('keeps keenable at the front of the search chain even when firecrawl is keyed', () => {
     const keyed = config({
       engines: { tavily: { apiKey: 't' }, exa: { apiKey: 'e' }, firecrawl: { apiKey: 'f' } },
     });
     expect(names(planRole('search', keyed, undefined, WITH_AGY).chain)).toEqual([
-      'firecrawl',
       'keenable',
+      'firecrawl',
       'youcom',
       'antigravity-cli',
       'tavily',
@@ -112,12 +112,12 @@ describe('engine chains per role', () => {
   });
 
   it('searches through the keyless engines on a bare machine', () => {
-    // Zero config, nothing installed: search still works, because Firecrawl,
-    // Keenable, and You.com all accept unauthenticated calls against a free
+    // Zero config, nothing installed: search still works, because Keenable,
+    // Firecrawl, and You.com all accept unauthenticated calls against a free
     // keyless allowance (no signup), and each backs up the one before.
     expect(names(planRole('search', config(), undefined, BARE).chain)).toEqual([
-      'firecrawl',
       'keenable',
+      'firecrawl',
       'youcom',
     ]);
   });
@@ -243,7 +243,7 @@ describe('run plans', () => {
         env,
       });
       expect(plans.map((plan) => plan.source)).toEqual(['web', 'x']);
-      expect(plans[0].engine?.name).toBe('firecrawl');
+      expect(plans[0].engine?.name).toBe('keenable');
       expect(plans[1].engine?.name).toBe('grok-cli');
     } finally {
       restoreHome();
@@ -294,7 +294,7 @@ describe('run plans', () => {
     });
     restore();
     expect(plan.source).toBe('x');
-    expect(plan.engine?.name).toBe('firecrawl');
+    expect(plan.engine?.name).toBe('keenable');
     expect(plan.notes).toContain(X_DEGRADE_NOTE);
   });
 
@@ -363,8 +363,8 @@ describe('cooldown reorders the chain without changing the base order', () => {
       cooling({ tavily: FUTURE }),
     );
     expect(names(chain)).toEqual([
-      'firecrawl',
       'keenable',
+      'firecrawl',
       'youcom',
       'antigravity-cli',
       'exa',
@@ -383,8 +383,8 @@ describe('cooldown reorders the chain without changing the base order', () => {
     });
     const partlyCooling = cooling({ 'tavily::key:0': FUTURE });
     expect(names(planRole('search', multiKey, undefined, WITH_AGY, partlyCooling).chain)).toEqual([
-      'firecrawl',
       'keenable',
+      'firecrawl',
       'youcom',
       'antigravity-cli',
       'tavily',
@@ -394,8 +394,8 @@ describe('cooldown reorders the chain without changing the base order', () => {
     const fullyCooling = cooling({ 'tavily::key:0': FUTURE, 'tavily::key:1': FUTURE });
     const { chain, notes } = planRole('search', multiKey, undefined, WITH_AGY, fullyCooling);
     expect(names(chain)).toEqual([
-      'firecrawl',
       'keenable',
+      'firecrawl',
       'youcom',
       'antigravity-cli',
       'exa',
@@ -416,8 +416,8 @@ describe('cooldown reorders the chain without changing the base order', () => {
     const { chain } = planRole('search', keyed, undefined, WITH_AGY, cd);
     // All cooling means the base order is unchanged, and nothing is dropped.
     expect(names(chain)).toEqual([
-      'firecrawl',
       'keenable',
+      'firecrawl',
       'youcom',
       'antigravity-cli',
       'tavily',
@@ -458,8 +458,8 @@ describe('cooldown reorders the chain without changing the base order', () => {
       cooling({ tavily: PAST }),
     );
     expect(names(chain)).toEqual([
-      'firecrawl',
       'keenable',
+      'firecrawl',
       'youcom',
       'antigravity-cli',
       'tavily',
