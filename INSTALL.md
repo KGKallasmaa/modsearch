@@ -173,10 +173,10 @@ your harness's skill directory): fall back to Path A, which needs only git.
 modsearch does three jobs, and none of them blocks on setup:
 
 - **Web search and page fetch (`-q`, `-u`) work as installed.** The default
-  engine is Firecrawl's keyless tier: 1,000 free credits/month, no account, no
-  key. Keenable's keyless search (1,000 requests/hour per IP, no signup) backs
-  it up, and so does You.com's keyless search (100 searches/day per IP, no
-  signup). A dependency-free local fetcher backs page fetch as the floor. If the
+  search engine is Keenable's keyless tier: 1,000 requests/hour per IP, no
+  account, no key. Firecrawl's keyless tier (1,000 free credits/month, no
+  signup) backs it up and is the default page fetch engine, and You.com's
+  keyless search (100 searches/day per IP, no signup) backs search up too. A dependency-free local fetcher backs page fetch as the floor. If the
   user wants nothing more, skip to Step 4.
 - **X (Twitter) search needs Grok Build** (SuperGrok or X Premium), installed and
   signed in. Set it up only if the user wants X. It needs no key beyond that login.
@@ -226,7 +226,7 @@ steps, each safe to re-run.
    agy   # opens the browser for the user's one-time sign-in, then they exit
    ```
 
-If a browser sign-in is not possible, the keyless Firecrawl, Keenable, and You.com defaults
+If a browser sign-in is not possible, the keyless Keenable, Firecrawl, and You.com defaults
 already keep the CLI fully usable. Add a key only when the user wants a personal
 quota on top. Tavily, Exa, and Firecrawl have a free tier and need no card. A free
 Keenable key (from https://app.keenable.ai) gives 100,000 requests a month. Run settings through
@@ -280,9 +280,9 @@ Node
   status:  OK
 
 search (search the web)
-  resolved: firecrawl
-  - firecrawl         READY    keyless: works with no key and no signup ...
+  resolved: keenable
   - keenable          READY    keyless: works with no key and no signup (1,000 requests/hour, ...)
+  - firecrawl         READY    keyless: works with no key and no signup ...
   - youcom            READY    keyless: works with no key and no signup (100 searches/day, ...)
 
 fetch (fetch a page)
@@ -298,8 +298,8 @@ How to read it:
 
 - **`Node status: OK`** means the runtime meets the floor (22.13+). If it says
   `TOO OLD`, upgrade Node and stop here, because nothing else will work.
-- **`search resolved: <engine>`** means a web engine is ready. Keyless Firecrawl,
-  Keenable, and You.com make this true on a bare install. agy or a configured key resolves ahead of
+- **`search resolved: <engine>`** means a web engine is ready. Keyless Keenable,
+  Firecrawl, and You.com make this true on a bare install. agy or a configured key resolves ahead of
   it when present. If it reads `(none available)`, the installation is
   inconsistent: reinstall this exact release before adding credentials. Each
   not-ready engine prints a `fix:` line when setup can help.
@@ -326,7 +326,7 @@ who answered and an `items` list with `url`s. That is a working install.
   as broken.
 - `Every engine for the web source failed` -> the engines themselves errored at
   runtime (no network, a timeout, or spent quotas), not a setup gap: keyless
-  Firecrawl, Keenable, and You.com mean a bare install always has a search engine. Read the per-engine
+  Keenable, Firecrawl, and You.com mean a bare install always has a search engine. Read the per-engine
   attempt lines for the actual cause.
 - A timeout -> retry once with `--timeout 300000`. agy runs take 10-30 seconds.
 - Any other message -> it is catalogued with its cause and fix in

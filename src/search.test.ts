@@ -556,11 +556,11 @@ describeSpawn('a run deadline bounds the whole chain', () => {
 
   it('cuts a hung engine at the deadline and skips the engines after it', async () => {
     // agy would answer after 10s, inside its 20s per-engine budget. The 1.5s
-    // run deadline must end it instead, and firecrawl must not start at all.
+    // run deadline must end it instead, and keenable must not start at all.
     const fetchCalls: unknown[] = [];
     vi.stubGlobal('fetch', async (...args: unknown[]) => {
       fetchCalls.push(args);
-      throw new Error('firecrawl should not run once the deadline is spent');
+      throw new Error('keenable should not run once the deadline is spent');
     });
     const config = agyConfig({ stdout: agySearchEnvelope('late'), delaySeconds: 10 });
     const startedAt = Date.now();
@@ -579,7 +579,7 @@ describeSpawn('a run deadline bounds the whole chain', () => {
     expect(fetchCalls).toHaveLength(0);
     expect(error.attempts[0]).toMatchObject({ engine: 'antigravity-cli', ok: false });
     expect(error.attempts[1]).toMatchObject({
-      engine: 'firecrawl',
+      engine: 'keenable',
       ok: false,
       durationSeconds: null,
       error: expect.stringMatching(/run deadline of 1500 ms/),
@@ -587,7 +587,7 @@ describeSpawn('a run deadline bounds the whole chain', () => {
   }, 20_000);
 
   it('gives the next engine only the time the deadline has left', async () => {
-    // agy fails at once. firecrawl hangs until aborted: with a 20s per-engine
+    // agy fails at once. keenable hangs until aborted: with a 20s per-engine
     // budget it would hold the run for 20s, so the deadline has to cap it.
     vi.stubGlobal('fetch', (_url: unknown, init: { signal: AbortSignal }) => {
       return new Promise((_resolve, reject) => {
@@ -600,28 +600,27 @@ describeSpawn('a run deadline bounds the whole chain', () => {
       config,
       env: BARE_ENV,
       timeoutMs: 20_000,
-      // Wide enough that a slow spawn of the failing agy still leaves firecrawl
+      // Wide enough that a slow spawn of the failing agy still leaves keenable
       // a turn, short enough that 20s would plainly show the cap missing.
       deadlineMs: 6_000,
     });
 
-    const firecrawl = error.attempts.find((attempt) => attempt.engine === 'firecrawl');
-    const capped = Number(/timed out after (\d+) ms/.exec(firecrawl?.error ?? '')?.[1]);
+    const keenable = error.attempts.find((attempt) => attempt.engine === 'keenable');
+    const capped = Number(/timed out after (\d+) ms/.exec(keenable?.error ?? '')?.[1]);
     expect(capped).toBeGreaterThan(0);
     expect(capped).toBeLessThanOrEqual(6_000);
   }, 20_000);
 
   it('leaves the fallback room when a subprocess engine ignores its own timeout', async () => {
     // agy sleeps far past its 500ms timeout. Under a deadline the kill comes a
-    // short grace after that timeout, not at the deadline, so firecrawl still
+    // short grace after that timeout, not at the deadline, so keenable still
     // gets its turn inside the 10s run.
     vi.stubGlobal(
       'fetch',
       async () =>
         new Response(
           JSON.stringify({
-            success: true,
-            data: { web: [{ title: 'T', url: 'https://t.example', description: 'd' }] },
+            results: [{ title: 'T', url: 'https://t.example', snippet: 'd' }],
           }),
           { status: 200 },
         ),
@@ -635,7 +634,7 @@ describeSpawn('a run deadline bounds the whole chain', () => {
       deadlineMs: 10_000,
     });
 
-    expect(result.results[0].engine).toBe('firecrawl');
+    expect(result.results[0].engine).toBe('keenable');
     expect(result.results[0].attempts[0]).toMatchObject({ engine: 'antigravity-cli', ok: false });
   }, 20_000);
 

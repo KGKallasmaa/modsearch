@@ -8,7 +8,7 @@
 
 <p align="center">🥇 <b>The strongest free web search plugin for DeepSeek Harness (dsh)</b> 🥇</p>
 
-<p align="center">Engines: <b>Firecrawl</b> (keyless, default) · <b>Keenable</b> (keyless) · <b>You.com</b> (keyless) · <b>Antigravity CLI</b> · <b>Tavily</b> · <b>Exa</b> · <b>Grok (X)</b> · <b>local</b>, with automatic failover</p>
+<p align="center">Engines: <b>Keenable</b> (keyless, default search) · <b>Firecrawl</b> (keyless, default fetch) · <b>You.com</b> (keyless) · <b>Antigravity CLI</b> · <b>Tavily</b> · <b>Exa</b> · <b>Grok (X)</b> · <b>local</b>, with automatic failover</p>
 
 <p align="center">
   <a href="./README.zh-CN.md">简体中文</a> ·
@@ -28,7 +28,7 @@
   <img src="https://img.shields.io/badge/users-unknown-lightgrey?style=flat-square" alt="Users unknown">
 </p>
 
-Models like DeepSeek and GLM have no web access, or a weak one. ModSearch is a plug-in that greatly strengthens web search, X search, and single-page fetch. It works the moment it lands: the default engine is Firecrawl's keyless tier, [1,000 free credits every month](https://www.firecrawl.dev/blog/firecrawl-keyless-launch), with no account, no API key, and no card.
+Models like DeepSeek and GLM have no web access, or a weak one. ModSearch is a plug-in that greatly strengthens web search, X search, and single-page fetch. It works the moment it lands: the default search engine is Keenable's keyless tier (1,000 requests/hour per IP), and page fetch runs on Firecrawl's keyless tier, [1,000 free credits every month](https://www.firecrawl.dev/blog/firecrawl-keyless-launch), with no account, no API key, and no card.
 
 ## Talk to us
 
@@ -37,7 +37,7 @@ Hit a problem? [Open an issue](https://github.com/liustack/modsearch/issues/new/
 ## Features
 
 - **🥇 The strongest free web search plugin for DeepSeek Harness (dsh):** one command installs it, `npx -y @deepseek-ai/dsh plugin --profile web add @liustack/modsearch@5.10.12`. In the desktop app's Add plugin dialog, enter `@liustack/modsearch`, not the GitHub URL. Details in [harness setup](docs/harness-setup.md#deepseek-harness-dsh).
-- **Free out of the box, no signup.** Search and page fetch run on Firecrawl Keyless by default: [1,000 free credits/month](https://www.firecrawl.dev/blog/firecrawl-keyless-launch), no account, no API key, no card. Every fallback channel is free too: Antigravity CLI needs only a browser sign-in, and Tavily, Exa, and a free Firecrawl key each add their own monthly quota with no card required.
+- **Free out of the box, no signup.** Search runs on Keenable Keyless by default (1,000 requests/hour per IP), and page fetch on Firecrawl Keyless ([1,000 free credits/month](https://www.firecrawl.dev/blog/firecrawl-keyless-launch)): no account, no API key, no card. Every fallback channel is free too: Antigravity CLI needs only a browser sign-in, and Tavily, Exa, and a free Firecrawl key each add their own monthly quota with no card required.
 - **Automatic failover.** When a channel fails or exhausts its quota, the next one takes over.
 - **Per-engine key rotation.** Give Tavily, Exa, Firecrawl, or Keenable multiple comma-separated keys. Authentication, rate-limit, and quota failures rotate to the next key before the engine chain falls back.
 - **Searches X (Twitter).** With Grok Build installed, ModSearch queries the corpus that web indexes cannot reach.
@@ -65,12 +65,12 @@ Ask which Node.js line is still in maintenance. `read_page` reads the release pa
 
 ## Supported engines
 
-Firecrawl, Keenable, and You.com work with zero setup. Every other engine is one command away. Keys live in `~/.modsearch/config.json` (0600, masked when shown):
+Keenable, Firecrawl, and You.com work with zero setup. Every other engine is one command away. Keys live in `~/.modsearch/config.json` (0600, masked when shown):
 
 | Engine | Does | Free tier | Turn it on |
 | :-- | :-- | :-- | :-- |
-| Firecrawl (default) | web search + page fetch | keyless: 1,000 free credits/month, no signup. A free key adds your own 1,000/month | nothing, it works as installed |
-| Keenable | web search | keyless: 1,000 requests/hour per IP (shared by everyone on that IP), no signup. A free key gives 100,000 requests/month of your own | nothing, it works as installed |
+| Keenable (default search) | web search | keyless: 1,000 requests/hour per IP (shared by everyone on that IP), no signup. A free key gives 100,000 requests/month of your own | nothing, it works as installed |
+| Firecrawl (default fetch) | web search + page fetch | keyless: 1,000 free credits/month, no signup. A free key adds your own 1,000/month | nothing, it works as installed |
 | You.com | web search | keyless: 100 searches/day per IP (shared by everyone on that IP), no signup | nothing, it works as installed |
 | Antigravity CLI | web search + page fetch | free, browser sign-in | install `agy` and sign in |
 | Tavily | web search | 1,000 credits/month, no card | `modsearch config set tavily.apiKey <key>` |
@@ -82,7 +82,7 @@ Keys can also come from the environment (`TAVILY_API_KEY`, `EXA_API_KEY`, `FIREC
 
 ## Installation
 
-**Step 1, hand it to your AI.** Search and page fetch work as soon as the skill lands, on Firecrawl's free keyless quota, so installation is one message:
+**Step 1, hand it to your AI.** Search and page fetch work as soon as the skill lands, on Keenable's and Firecrawl's free keyless quotas, so installation is one message:
 
 > Install and configure the modsearch skill following INSTALL.md at https://github.com/liustack/modsearch, then run the health check and tell me the result.
 

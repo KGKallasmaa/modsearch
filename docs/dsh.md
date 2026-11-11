@@ -86,7 +86,7 @@ modsearch config set firecrawl.keylessFetch false
 modsearch config set cooldown off
 ```
 
-No setting is required to start: search and page fetch run on Firecrawl's keyless free quota (1,000 free credits/month, no signup), and search falls back to Keenable's keyless pool (1,000 requests/hour per IP, no signup), then to You.com's keyless search (100 searches/day per IP, no signup). Keyless public-page fetch is on by default. It sends the requested URL to Firecrawl's cloud crawler, and the result warning names that route. `firecrawl.keylessFetch false` keeps automatic fetch local-only. Private and reserved targets are never sent to Firecrawl and fall through to the local fetcher.
+No setting is required to start: search runs on Keenable's keyless pool (1,000 requests/hour per IP, no signup) and page fetch on Firecrawl's keyless free quota (1,000 free credits/month, no signup), and search falls back to Firecrawl's keyless quota, then to You.com's keyless search (100 searches/day per IP, no signup). Keyless public-page fetch is on by default. It sends the requested URL to Firecrawl's cloud crawler, and the result warning names that route. `firecrawl.keylessFetch false` keeps automatic fetch local-only. Private and reserved targets are never sent to Firecrawl and fall through to the local fetcher.
 
 See the [full engine configuration reference](../skills/modsearch/references/configure.md) and [security model](security.md).
 
